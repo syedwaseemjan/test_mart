@@ -1,32 +1,32 @@
-[project]
-requires-python = ">=3.9"
+[tool.poetry]
 name = "test_mart"
 version = "0.1.0"
 description = "A FastAPI-powered backend for an e-commerce admin dashboard providing sales analytics, revenue insights, and inventory management tools."
-authors = [
-    { name = "Waseem Jan", email = "syedwaseemjan@gmail.com" },
-]
-dependencies = [
-    "fastapi>=0.103.0",
-    "uvicorn==0.23.2",
-    "pydantic>=2.0.0",
-    "requests>=2.32.0",
-    "loguru>=0.7.0",
-    "joblib>=1.2.0",
-    "scikit-learn>=1.5.0"
+authors = ["Waseem Jan <syedwaseemjan@gmail.com>"]
+readme = "README.md"
+license = "MIT"  # Add if applicable
+packages = [
+    { include = "app" }
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.2",
-    "black>=24.3",
-    "autopep8>=2.0.0",
-    "ipdb>=0.13.0",
-    "pylint>=3.0.0"
-]
-aws = [
-    "mangum>=0.17.0"
-]
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+fastapi = ">=0.103.0"
+uvicorn = "0.23.2"
+pydantic = ">=2.0.0"
+requests = ">=2.32.0"
+loguru = ">=0.7.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.2"
+black = ">=24.3"
+autopep8 = ">=2.0.0"
+ipdb = ">=0.13.0"
+pylint = ">=3.0.0"
+
+[tool.poetry.group.aws.dependencies]
+mangum = ">=0.17.0"
 
 [tool.black]
 line-length = 88
@@ -44,8 +44,5 @@ exclude = '''
 '''
 
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["."]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

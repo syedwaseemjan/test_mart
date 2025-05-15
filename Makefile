@@ -7,32 +7,21 @@ ifeq ($(TIMEOUT),)
 TIMEOUT := 60
 endif
 
-ifeq ($(MODEL_PATH),)
-MODEL_PATH := ./ml/model/
-endif
-
-ifeq ($(MODEL_NAME),)
-MODEL_NAME := model.pkl
-endif
-
 # Target section and Global definitions
 # -----------------------------------------------------------------------------
 .PHONY: all clean test install run deploy down
 
 all: clean test install run deploy down
 
-venv:
-	uv venv .venv
-
 test: install
-	uv run pytest tests -vv --show-capture=all
+	poetry run pytest tests -vv --show-capture=all
 
-install: generate_dot_env venv
-	pip install uv --break-system-packages
-	uv pip install -e ".[dev]"
+install: generate_dot_env
+	# poetry install --with dev,aws
+	poetry install --with dev
 
-run: venv
-	PYTHONPATH=app/ uv run uvicorn main:app --reload --host 0.0.0.0 --port 8080
+run:
+	PYTHONPATH=app/ poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8080
 
 deploy: generate_dot_env
 	docker-compose build

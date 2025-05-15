@@ -13,7 +13,6 @@ ARG DEV=false
 RUN if [ "$DEV" = "true" ] ; then uv pip install -e .[dev] ; fi
 
 COPY ./app/ ./
-COPY ./ml/model/ ./ml/model/
 
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
