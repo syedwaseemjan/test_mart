@@ -1,28 +1,54 @@
-from pydantic import BaseModel
+from datetime import date, datetime
+from decimal import Decimal
+from typing import Annotated
+
+from pydantic import BaseModel, Field
 
 
-class TestResponse(BaseModel):
-    prediction: float
+class ProductBase(BaseModel):
+    name: Annotated[str, Field(...)]
+    category: Annotated[str, Field(...)]
+    price: Annotated[Decimal, Field(...)]
 
 
-class HealthResponse(BaseModel):
-    status: bool
+class ProductCreate(ProductBase):
+    pass
 
 
-class TestDataInput(BaseModel):
-    feature1: float
-    feature2: float
-    feature3: float
-    feature4: float
-    feature5: float
+class Product(ProductBase):
+    id: Annotated[int, Field(...)]
 
-    def get_array(self):
-        return [
-            [
-                self.feature1,
-                self.feature2,
-                self.feature3,
-                self.feature4,
-                self.feature5,
-            ]
-        ]
+    model_config = {"from_attributes": True}
+
+
+class InventoryBase(BaseModel):
+    stock: Annotated[int, Field(...)]
+
+
+class InventoryCreate(InventoryBase):
+    product_id: Annotated[int, Field(...)]
+
+
+class Inventory(InventoryBase):
+    id: Annotated[int, Field(...)]
+    product_id: Annotated[int, Field(...)]
+    last_updated: Annotated[datetime, Field(...)]
+
+    model_config = {"from_attributes": True}
+
+
+class SaleBase(BaseModel):
+    product_id: Annotated[int, Field(...)]
+    quantity: Annotated[int, Field(...)]
+    sale_date: Annotated[date, Field(...)]
+    total_amount: Annotated[Decimal, Field(...)]
+
+
+class SaleCreate(SaleBase):
+    pass
+
+
+class Sale(SaleBase):
+    id: Annotated[int, Field(...)]
+
+    model_config = {"from_attributes": True}
