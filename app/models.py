@@ -1,6 +1,13 @@
-import datetime
-
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import (
+    DECIMAL,
+    TIMESTAMP,
+    Column,
+    Date,
+    ForeignKey,
+    Integer,
+    String,
+    func,
+)
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -8,29 +15,34 @@ from app.database import Base
 
 class Product(Base):
     __tablename__ = "products"
+
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), unique=True, index=True, nullable=False)
-    category = Column(String(50), index=True)
-    price = Column(Float, nullable=False)
-    inventory_count = Column(Integer, default=0)
+    name = Column(String(255), nullable=False)
+    category = Column(String(255), nullable=False)
+    price = Column(DECIMAL(10, 2), nullable=False)
 
     sales = relationship("Sale", back_populates="product")
+    inventory = relationship("Inventory", uselist=False, back_populates="product")
 
 
 class Sale(Base):
     __tablename__ = "sales"
+
     id = Column(Integer, primary_key=True, index=True)
     product_id = Column(Integer, ForeignKey("products.id"))
     quantity = Column(Integer, nullable=False)
-    total_price = Column(Float, nullable=False)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    sale_date = Column(Date, nullable=False)
+    total_amount = Column(DECIMAL(10, 2), nullable=False)
 
     product = relationship("Product", back_populates="sales")
 
 
-class InventoryChange(Base):
-    __tablename__ = "inventory_changes"
+class Inventory(Base):
+    __tablename__ = "inventory"
+
     id = Column(Integer, primary_key=True, index=True)
     product_id = Column(Integer, ForeignKey("products.id"))
-    change = Column(Integer)  # positive or negative
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    stock = Column(Integer, nullable=False)
+    last_updated = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+    product = relationship("Product", back_populates="inventory")
