@@ -37,7 +37,7 @@ pytest-cov = "^6.1.1"
 mangum = ">=0.17.0"
 
 [tool.black]
-line-length = 88
+line-length = 120
 target-version = ['py310', 'py311']
 include = '''
 ^(
@@ -82,6 +82,7 @@ exclude = [
     ".venv",
     ".github"
 ]
+line-length = 120
 
 [tool.mypy]
 files = ["app", "tests"]
