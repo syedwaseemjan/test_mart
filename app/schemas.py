@@ -45,7 +45,6 @@ class SaleBase(BaseModel):
     product_id: Annotated[int, Field(...)]
     quantity: Annotated[int, Field(...)]
     sale_date: Annotated[date, Field(...)]
-    total_amount: Annotated[Decimal, Field(...)]
 
 
 class SaleCreate(SaleBase):
@@ -54,5 +53,6 @@ class SaleCreate(SaleBase):
 
 class Sale(SaleBase):
     id: Annotated[int, Field(...)]
+    total_amount: Annotated[Decimal, Field(...)]
 
     model_config = {"from_attributes": True}
