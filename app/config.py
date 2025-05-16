@@ -1,10 +1,11 @@
 import logging
 import sys
 
-from logger import InterceptHandler
 from loguru import logger
 from starlette.config import Config
 from starlette.datastructures import Secret
+
+from logger import InterceptHandler
 
 config = Config(".env")
 

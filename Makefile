@@ -47,3 +47,11 @@ clean:
 	rm -rf htmlcov
 	rm -rf .tox/
 	rm -rf docs/_build
+
+lint:
+	@echo "Running all linters..."
+	poetry run black .
+	poetry run isort .
+	poetry run ruff check .
+	poetry run mypy .
+	@echo "Linting complete!"

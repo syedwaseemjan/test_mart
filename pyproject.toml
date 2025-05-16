@@ -38,7 +38,12 @@ mangum = ">=0.17.0"
 [tool.black]
 line-length = 88
 target-version = ['py310', 'py311']
-include = '\.pyi?$'
+include = '''
+^(
+  app/.*\.py
+  |tests/.*\.py
+)$
+'''
 exclude = '''
 /(
   \.toml
@@ -47,6 +52,8 @@ exclude = '''
   |\.ini
   |Dockerfile
   |Jenkinfile
+  |.venv
+  |.github
 )/
 '''
 
@@ -54,22 +61,27 @@ exclude = '''
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length = 88
-target-version = ["py311"]
 
 [tool.isort]
 profile = "black"
-src_paths = ["app"]
+src_paths = ["app", "tests"]
 
 [tool.ruff]
+src = ["app", "tests"]
+include = ["*.py"]
 select = [
   "E", "F", "W",  # Basic errors
   "UP",           # Pyupgrade
   "I",            # isort
   "PLC", "PLE",   # Pylint equivalents
 ]
-ignore = ["E501"]  # Black handles line length
+ignore = ["E501", "I001"]  # Black handles line length
+exclude = [
+    "alembic/",
+    ".venv",
+    ".github"
+]
 
 [tool.mypy]
+files = ["app", "tests"]
 strict = true
