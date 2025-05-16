@@ -2,7 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class ProductBase(BaseModel):
@@ -12,7 +12,15 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    pass
+    name: str
+    category: str
+    price: float = Field(..., description="Price must be greater than zero")
+
+    @validator("price")
+    def price_must_be_positive(cls, value):
+        if value <= 0:
+            raise ValueError("Price must be more than 0")
+        return value
 
 
 class Product(ProductBase):

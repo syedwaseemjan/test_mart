@@ -5,7 +5,7 @@ from loguru import logger
 from starlette.config import Config
 from starlette.datastructures import Secret
 
-from logger import InterceptHandler
+from app.logger import InterceptHandler
 
 config = Config(".env")
 
@@ -20,7 +20,5 @@ PROJECT_NAME: str = config("PROJECT_NAME", default="TestMart")
 
 # logging configuration
 LOGGING_LEVEL = logging.DEBUG if DEBUG else logging.INFO
-logging.basicConfig(
-    handlers=[InterceptHandler(level=LOGGING_LEVEL)], level=LOGGING_LEVEL
-)
+logging.basicConfig(handlers=[InterceptHandler(level=LOGGING_LEVEL)], level=LOGGING_LEVEL)
 logger.configure(handlers=[{"sink": sys.stderr, "level": LOGGING_LEVEL}])
