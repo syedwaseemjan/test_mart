@@ -41,7 +41,7 @@ class Inventory(Base):
     __tablename__ = "inventory"
 
     id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer, ForeignKey("products.id"))
+    product_id = Column(Integer, ForeignKey("products.id"), unique=True, nullable=False)
     stock = Column(Integer, nullable=False)
     last_updated = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
 

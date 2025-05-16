@@ -37,6 +37,10 @@ class Inventory(InventoryBase):
     model_config = {"from_attributes": True}
 
 
+class InventoryUpdate(BaseModel):
+    stock: int
+
+
 class SaleBase(BaseModel):
     product_id: Annotated[int, Field(...)]
     quantity: Annotated[int, Field(...)]
