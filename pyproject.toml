@@ -27,6 +27,10 @@ black = ">=24.3"
 autopep8 = ">=2.0.0"
 ipdb = ">=0.13.0"
 pylint = ">=3.0.0"
+isort = "^6.0.1"
+ruff = "^0.11.10"
+mypy = "^1.15.0"
+pre-commit = "^4.2.0"
 
 [tool.poetry.group.aws.dependencies]
 mangum = ">=0.17.0"
@@ -49,3 +53,23 @@ exclude = '''
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+src_paths = ["app"]
+
+[tool.ruff]
+select = [
+  "E", "F", "W",  # Basic errors
+  "UP",           # Pyupgrade
+  "I",            # isort
+  "PLC", "PLE",   # Pylint equivalents
+]
+ignore = ["E501"]  # Black handles line length
+
+[tool.mypy]
+strict = true
