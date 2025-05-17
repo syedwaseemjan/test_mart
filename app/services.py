@@ -152,8 +152,8 @@ class SaleService:
 
         elif period == "year":
             results = (
-                self.db.query(extract("year", sale_date).label("year"), total).group_by("year").all()
-            )  # type: ignore
+                self.db.query(extract("year", sale_date).label("year"), total).group_by("year").all()  # type: ignore
+            )
             return [{"year": int(r[0]), "total_amount": float(r[1])} for r in results]
 
         return []
