@@ -5,23 +5,21 @@ A FastAPI-powered backend for an e-commerce admin dashboard providing sales anal
 ## Development Requirements
 
 - Python 3.11+
-- Uv (Python Package Manager)
+- Docker
 
 ## Installation
 
 ```sh
-python -m venv venv
-source venv/bin/activate
-make install
+docker-compose build --no-cache
+docker-compose up
+make migrate
+make lint
+make test
 ```
 
-## Runnning Localhost
+## Runnning linting
 
-`make run`
-
-## Deploy app
-
-`make deploy`
+`make lint`
 
 ## Running Tests
 
@@ -62,38 +60,3 @@ test_mart
 │  │   └── inventory.py
 ```
 
-
-### Enable APIs
-
-1. Cloud Run API
-2. Cloud Build API
-3. IAM API
-
-### Deploy to Cloud Run
-
-1. Run `gcp-deploy.sh`
-
-### Clean up
-
-1. Delete Cloud Run
-2. Delete Docker image in GCR
-
-## AWS
-
-Deploying inference service to AWS Lambda
-
-### Authenticate
-
-1. Install `awscli` and `sam-cli`
-2. `aws configure`
-
-### Deploy to Lambda
-
-1. Run `sam build`
-2. Run `sam deploy --guiChange this portion for other types of models
-
-## Add the correct type hinting when completed
-
-`aws cloudformation delete-stack --stack-name <STACK_NAME_ON_CREATION>`
-
-Made by <https://github.com/arthurhenrique/cookiecutter-fastapi/graphs/contributors> with ❤️
