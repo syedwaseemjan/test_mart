@@ -7,28 +7,12 @@ ifeq ($(TIMEOUT),)
 TIMEOUT := 60
 endif
 
-# Target section and Global definitions
+# Local: docker
 # -----------------------------------------------------------------------------
-.PHONY: all test install run deploy down migration migrate
-
-all: clean test install run deploy down
+.PHONY: test lint migrate migration docker install run generate_dot_env
 
 test:
 	docker-compose exec app poetry run pytest tests -vv --show-capture=all
-
-install: generate_dot_env
-	# poetry install --with dev,aws
-	poetry install --with dev
-
-run:
-	PYTHONPATH=app/ poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8080
-
-deploy: generate_dot_env
-	docker-compose build
-	docker-compose up -d
-
-generate_dot_env:
-	poetry run python scripts/generate_env.py
 
 lint:
 	@echo "Running all linters inside Docker..."
@@ -49,3 +33,15 @@ migration:
 
 demo_data:
 	docker-compose exec app poetry run python scripts/demo_data.py
+
+# Local: direct on the OS
+# -----------------------------------------------------------------------------
+install: generate_dot_env
+	# poetry install --with dev,aws
+	poetry install --with dev
+
+run:
+	PYTHONPATH=app/ poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8080
+
+generate_dot_env:
+	poetry run python scripts/generate_env.py
