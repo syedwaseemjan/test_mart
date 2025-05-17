@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import HTTPException, status
-from sqlalchemy import extract, func
+from sqlalchemy import and_, extract, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -93,9 +93,11 @@ class SaleService:
                 )
 
             total_amount = product.price * sale.quantity
-            db_sale = models.Sale(
-                product_id=sale.product_id, quantity=sale.quantity, sale_date=sale.sale_date, total_amount=total_amount
-            )
+            db_sale = models.Sale()
+            db_sale.product_id = sale.product_id
+            db_sale.quantity = sale.quantity
+            db_sale.sale_date = sale.sale_date
+            db_sale.total_amount = total_amount
             self.db.add(db_sale)
 
             inventory.stock -= sale.quantity
@@ -107,7 +109,20 @@ class SaleService:
             self.db.rollback()
             raise HTTPException(status_code=500, detail="Internal server error during sale transaction")
 
-    def get_sales_by_date_range(self, start_date: date, end_date: date) -> list[models.Sale]:
+    def get_sales_by_date_range(
+        self, start_date: Optional[date] = None, end_date: Optional[date] = None
+    ) -> list[models.Sale]:
+        query = self.db.query(models.Sale)
+        filters = []
+        if start_date:
+            filters.append(models.Sale.sale_date >= start_date)
+        if end_date:
+            filters.append(models.Sale.sale_date <= end_date)
+
+        if filters:
+            query = query.filter(and_(*filters))
+
+        return query.all()
         return (
             self.db.query(models.Sale)
             .filter(models.Sale.sale_date >= start_date, models.Sale.sale_date <= end_date)
