@@ -23,6 +23,13 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     category: Mapped[str] = mapped_column(String(255), nullable=False)
     price: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(String(2000), nullable=True, default="")
+
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     sales: Mapped[list["Sale"]] = relationship(back_populates="product")
     inventory: Mapped[Optional["Inventory"]] = relationship(back_populates="product", uselist=False)

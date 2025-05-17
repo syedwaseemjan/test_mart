@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -9,6 +9,9 @@ class ProductBase(BaseModel):
     name: Annotated[str, Field(...)]
     category: Annotated[str, Field(...)]
     price: Annotated[Decimal, Field(...)]
+    description: Annotated[
+        Optional[str], Field(None, min_length=0, max_length=2000, description="Optional product description")
+    ]
 
 
 class ProductCreate(ProductBase):
@@ -25,6 +28,8 @@ class ProductCreate(ProductBase):
 
 class Product(ProductBase):
     id: Annotated[int, Field(...)]
+    created_at: Annotated[datetime, Field(..., description="Auto-generated timestamp")]
+    updated_at: Annotated[datetime, Field(..., description="Auto-updated timestamp")]
 
     model_config = {"from_attributes": True}
 
