@@ -34,6 +34,17 @@ migration:
 demo_data:
 	docker-compose exec app poetry run python scripts/demo_data.py
 
+flush_db:
+	@echo "Flushing MySQL database..."
+	@docker-compose exec db mysql -u$$(docker-compose exec db printenv MYSQL_USER) \
+		-p$$(docker-compose exec db printenv MYSQL_PASSWORD) \
+		-e "DROP DATABASE IF EXISTS $$(docker-compose exec db printenv MYSQL_DATABASE); \
+		    CREATE DATABASE $$(docker-compose exec db printenv MYSQL_DATABASE);"
+	@echo "Database flushed and recreated!"
+
+reset_db: flush_db migrate demo_data
+	@echo "Database reset complete with migrations and demo data!"
+
 # Local: direct on the OS
 # -----------------------------------------------------------------------------
 install: generate_dot_env
