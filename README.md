@@ -17,7 +17,7 @@ make lint
 make test
 ```
 
-## Runnning linting
+## Running linting
 
 `make lint`
 
