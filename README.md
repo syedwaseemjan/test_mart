@@ -40,29 +40,28 @@ make install
 Files related to application are in the `app` or `tests` directories.
 Application parts are:
 
-    app
-    |
-    | # Fast-API stuff
-    ├── api                 - web related stuff.
-    │   └── routes          - web routes.
-    ├── core                - application configuration, startup events, logging.
-    ├── schemas             - pydantic models for this application.
-    ├── services            - logic that is not just crud related.
-    ├── main-aws-lambda.py  - [Optional] FastAPI application for AWS Lambda creation and configuration.
-    └── main.py             - FastAPI application creation and configuration.
-    |
-    │
-    └── tests            - pytest
+```
+test_mart
+├──poetry.toml/
+├──pyproject.toml/
+├──Dockerfile/
+├──docker-compose/
+├──Dockerfile/
+├──alembic/
+├──tests/
+├──scripts/
+├──app/
+│  ├── main.py
+│  ├── models.py
+│  ├── database.py
+│  ├── schemas.py
+│  ├── routers/
+│  │   ├── __init__.py
+│  │   ├── product.py
+│  │   ├── sales.py
+│  │   └── inventory.py
+```
 
-## GCP
-
-Deploying inference service to Cloud Run
-
-### Authenticate
-
-1. Install `gcloud` cli
-2. `gcloud auth login`
-3. `gcloud config set project <PROJECT_ID>`
 
 ### Enable APIs
 
