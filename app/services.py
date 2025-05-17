@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Dict, List, Optional
+from typing import Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy import extract, func
@@ -23,7 +23,7 @@ class ProductService:
     def get_product(self, product_id: int) -> Optional[models.Product]:
         return self.db.query(models.Product).filter(models.Product.id == product_id).first()
 
-    def get_products(self, skip: int = 0, limit: int = 100) -> List[models.Product]:
+    def get_products(self, skip: int = 0, limit: int = 100) -> list[models.Product]:
         return self.db.query(models.Product).offset(skip).limit(limit).all()
 
 
@@ -57,10 +57,10 @@ class InventoryService:
     def get_inventory(self, product_id: int) -> Optional[models.Inventory]:
         return self.db.query(models.Inventory).filter(models.Inventory.product_id == product_id).first()
 
-    def get_all_inventory(self) -> List[models.Inventory]:
+    def get_all_inventory(self) -> list[models.Inventory]:
         return self.db.query(models.Inventory).all()
 
-    def get_low_stock(self, threshold: int = 10) -> List[models.Inventory]:
+    def get_low_stock(self, threshold: int = 10) -> list[models.Inventory]:
         return self.db.query(models.Inventory).filter(models.Inventory.stock < threshold).all()
 
     def update_inventory_stock(self, product_id: int, stock: int) -> Optional[models.Inventory]:
@@ -107,17 +107,17 @@ class SaleService:
             self.db.rollback()
             raise HTTPException(status_code=500, detail="Internal server error during sale transaction")
 
-    def get_sales_by_date_range(self, start_date: date, end_date: date) -> List[models.Sale]:
+    def get_sales_by_date_range(self, start_date: date, end_date: date) -> list[models.Sale]:
         return (
             self.db.query(models.Sale)
             .filter(models.Sale.sale_date >= start_date, models.Sale.sale_date <= end_date)
             .all()
         )
 
-    def get_sales_by_product(self, product_id: int) -> List[models.Sale]:
+    def get_sales_by_product(self, product_id: int) -> list[models.Sale]:
         return self.db.query(models.Sale).filter(models.Sale.product_id == product_id).all()
 
-    def get_revenue_by_period(self, period: str = "day") -> List[Dict]:
+    def get_revenue_by_period(self, period: str = "day") -> list[dict]:
         sale_date = models.Sale.sale_date
         total = func.sum(models.Sale.total_amount)
 
