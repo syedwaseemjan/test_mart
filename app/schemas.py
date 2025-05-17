@@ -14,7 +14,7 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     name: str
     category: str
-    price: float = Field(..., description="Price must be greater than zero")
+    price: Decimal = Field(..., description="Price must be greater than zero")
 
     @validator("price")
     def price_must_be_positive(cls, value):
