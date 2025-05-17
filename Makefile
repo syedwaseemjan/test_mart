@@ -9,12 +9,12 @@ endif
 
 # Target section and Global definitions
 # -----------------------------------------------------------------------------
-.PHONY: all clean test install run deploy down
+.PHONY: all test install run deploy down migration migrate
 
 all: clean test install run deploy down
 
-test: install
-	poetry run pytest tests -vv --show-capture=all
+test:
+	docker-compose exec app poetry run pytest tests -vv --show-capture=all
 
 install: generate_dot_env
 	# poetry install --with dev,aws
@@ -27,31 +27,25 @@ deploy: generate_dot_env
 	docker-compose build
 	docker-compose up -d
 
-down:
-	docker-compose down
-
 generate_dot_env:
-	@if [[ ! -e .env ]]; then \
-		cp .env.example .env; \
-	fi
-
-clean:
-	@find . -name '*.pyc' -exec rm -rf {} \;
-	@find . -name '__pycache__' -exec rm -rf {} \;
-	@find . -name 'Thumbs.db' -exec rm -rf {} \;
-	@find . -name '*~' -exec rm -rf {} \;
-	rm -rf .cache
-	rm -rf build
-	rm -rf dist
-	rm -rf *.egg-info
-	rm -rf htmlcov
-	rm -rf .tox/
-	rm -rf docs/_build
+	poetry run python scripts/generate_env.py
 
 lint:
-	@echo "Running all linters..."
-	poetry run black .
-	poetry run isort .
-	poetry run ruff check .
-	poetry run mypy .
+	@echo "Running all linters inside Docker..."
+	docker-compose exec app sh -c "\
+		poetry run black . && \
+		poetry run isort . && \
+		poetry run ruff check . && \
+		poetry run mypy . \
+	"
 	@echo "Linting complete!"
+
+migrate:
+	docker-compose exec app poetry run alembic upgrade head
+
+migration:
+	@read -p "Enter migration message: " msg; \
+	docker-compose exec app poetry run alembic revision --autogenerate -m "$$msg"
+
+demo_data:
+	docker-compose exec app poetry run python scripts/demo_data.py
