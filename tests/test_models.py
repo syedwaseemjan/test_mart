@@ -1,23 +1,16 @@
 from datetime import date
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from app.models import Base, Inventory, Product, Sale
+from app.models import Inventory, Product, Sale
 
 
 class TestProductModel:
     @pytest.fixture(autouse=True)
-    def setup(self):
-        self.engine = create_engine("sqlite:///:memory:")
-        Base.metadata.create_all(self.engine)
-        self.Session = sessionmaker(bind=self.engine)
-        self.session = self.Session()
+    def setup(self, test_db):
+        self.session = test_db
         yield
         self.session.rollback()
-        self.session.close()
-        self.engine.dispose()
 
     def test_product_creation(self):
         product = Product(name="Laptop", category="Electronics", price=1299.99)
@@ -39,19 +32,14 @@ class TestProductModel:
 
 class TestSaleModel:
     @pytest.fixture(autouse=True)
-    def setup(self):
-        self.engine = create_engine("sqlite:///:memory:")
-        Base.metadata.create_all(self.engine)
-        self.Session = sessionmaker(bind=self.engine)
-        self.session = self.Session()
+    def setup(self, test_db):
+        self.session = test_db
 
         self.product = Product(name="Test Product", category="Test", price=100.00)
         self.session.add(self.product)
         self.session.commit()
         yield
         self.session.rollback()
-        self.session.close()
-        self.engine.dispose()
 
     def test_sale_creation(self):
         sale = Sale(
@@ -79,19 +67,14 @@ class TestSaleModel:
 
 class TestInventoryModel:
     @pytest.fixture(autouse=True)
-    def setup(self):
-        self.engine = create_engine("sqlite:///:memory:")
-        Base.metadata.create_all(self.engine)
-        self.Session = sessionmaker(bind=self.engine)
-        self.session = self.Session()
+    def setup(self, test_db):
+        self.session = test_db
 
         self.product = Product(name="Inventory Product", category="Test", price=50.00)
         self.session.add(self.product)
         self.session.commit()
         yield
         self.session.rollback()
-        self.session.close()
-        self.engine.dispose()
 
     def test_inventory_relationship(self):
         inventory = Inventory(product=self.product, stock=100)

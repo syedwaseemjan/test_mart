@@ -32,12 +32,20 @@ class InventoryService:
         self.db = db
 
     def create_inventory(self, inventory: schemas.InventoryCreate) -> models.Inventory:
+        # Check if inventory already exists
         existing = self.db.query(models.Inventory).filter(models.Inventory.product_id == inventory.product_id).first()
-
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Inventory already exists for product_id {inventory.product_id}",
+            )
+
+        # Check if the referenced product exists
+        product = self.db.query(models.Product).filter(models.Product.id == inventory.product_id).first()
+        if not product:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Product with id {inventory.product_id} does not exist",
             )
 
         db_inventory = models.Inventory(**inventory.model_dump())
@@ -72,7 +80,7 @@ class SaleService:
         try:
             product = self.db.query(models.Product).filter(models.Product.id == sale.product_id).first()
             if not product:
-                raise HTTPException(status_code=404, detail="Product not found")
+                raise HTTPException(status_code=404, detail=f"Product with id {sale.product_id} does not exist")
 
             inventory = self.db.query(models.Inventory).filter(models.Inventory.product_id == sale.product_id).first()
             if not inventory:
