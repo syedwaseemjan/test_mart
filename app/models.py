@@ -28,6 +28,17 @@ class Product(Base):
     inventory: Mapped[Optional["Inventory"]] = relationship(back_populates="product", uselist=False)
 
 
+class Inventory(Base):
+    __tablename__ = "inventory"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), unique=True, nullable=False)
+    stock: Mapped[int] = mapped_column(Integer, nullable=False)
+    last_updated: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+
+    product: Mapped["Product"] = relationship(back_populates="inventory")
+
+
 class Sale(Base):
     __tablename__ = "sales"
 
@@ -38,14 +49,3 @@ class Sale(Base):
     total_amount: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
 
     product: Mapped["Product"] = relationship(back_populates="sales")
-
-
-class Inventory(Base):
-    __tablename__ = "inventory"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), unique=True, nullable=False)
-    stock: Mapped[int] = mapped_column(Integer, nullable=False)
-    last_updated: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
-
-    product: Mapped["Product"] = relationship(back_populates="inventory")
