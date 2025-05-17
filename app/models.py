@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -34,7 +34,7 @@ class Sale(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
-    sale_date: Mapped[datetime] = mapped_column(Date, nullable=False)
+    sale_date: Mapped[date] = mapped_column(Date, nullable=False)
     total_amount: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
 
     product: Mapped["Product"] = relationship(back_populates="sales")
