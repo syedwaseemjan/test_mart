@@ -1,20 +1,29 @@
-FROM python:3.11.0
+FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH=/test_mart
 
-WORKDIR /app
+WORKDIR /test_mart
 
-COPY pyproject.toml ./
-RUN pip install --upgrade pip && \
-    pip install uv && \
-    uv pip install -e .  # Installs dependencies using uv
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    curl \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-ARG DEV=false
-RUN if [ "$DEV" = "true" ] ; then uv pip install -e .[dev] ; fi
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="/root/.local/bin:$PATH"
 
-COPY ./app/ ./
+# Copy Poetry files first for dependency caching
+COPY pyproject.toml poetry.lock* README.md ./
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
+RUN poetry config virtualenvs.create false
+COPY . .
+RUN poetry install --no-interaction --no-ansi $(test "$DEBUG" = "True" && echo "--with dev")
 
 EXPOSE 8080
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
