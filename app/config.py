@@ -14,7 +14,15 @@ VERSION = "0.1.0"
 DEBUG: bool = config("DEBUG", cast=bool, default=False)
 MAX_CONNECTIONS_COUNT: int = config("MAX_CONNECTIONS_COUNT", cast=int, default=10)
 MIN_CONNECTIONS_COUNT: int = config("MIN_CONNECTIONS_COUNT", cast=int, default=10)
-SECRET_KEY: Secret = config("SECRET_KEY", cast=Secret, default="")
+
+
+def get_config_secret(key: str, default: str = "") -> Secret:
+    """Type-safe secret configuration loader"""
+    value = config(key, default=default)
+    return Secret(str(value))
+
+
+SECRET_KEY: Secret = get_config_secret("SECRET_KEY")
 
 PROJECT_NAME: str = config("PROJECT_NAME", default="TestMart")
 
