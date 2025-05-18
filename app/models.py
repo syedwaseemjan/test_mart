@@ -21,7 +21,7 @@ class Product(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    category: Mapped[str] = mapped_column(String(255), nullable=False)
+    category: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     price: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(2000), nullable=True, default="")
 
@@ -56,7 +56,7 @@ class Sale(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
-    sale_date: Mapped[date] = mapped_column(Date, nullable=False)
+    sale_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     total_amount: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
 
     product: Mapped["Product"] = relationship(back_populates="sales")
