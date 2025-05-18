@@ -59,9 +59,9 @@ make test
 ### Sales
 
 * `POST /sales/` — Record a sale
-* `GET /sales/` — List sales with optional date filters
-* `GET /sales/by-product/{product_id}` — List sales for a product
+* `GET /sales?start_date=2025-01-14&end_date=2025-12-14&product_id=1&category=Electronics` — List sales with optional product_id, date and category filters
 * `GET /sales/revenue?period=day|week|month|year` — Revenue aggregation
+* `GET /sales//revenue/comparison?period=day|week|month|year&compare_periods=2&category=Electronics` — Revenue aggregation
 
 ## Project structure
 

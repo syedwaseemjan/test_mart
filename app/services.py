@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import HTTPException, status
-from sqlalchemy import extract, func
+from sqlalchemy import desc, extract, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -184,3 +184,73 @@ class SaleService:
             return [{"year": int(r[0]), "total_amount": float(r[1])} for r in results]
 
         return []
+
+    def get_revenue_comparison(
+        self,
+        period: str = "month",
+        category: Optional[str] = None,
+        compare_periods: int = 2
+    ) -> list[dict]:
+        query = self.db.query(
+            extract("year", models.Sale.sale_date).label("year"),
+            func.sum(models.Sale.total_amount).label("total_amount")
+        )
+
+        if category:
+            query = query.join(models.Product).filter(models.Product.category == category)
+
+        # Add grouping based on period
+        if period == "day":
+            query = query.add_columns(
+                extract("month", models.Sale.sale_date).label("month"),
+                extract("day", models.Sale.sale_date).label("day")
+            ).group_by(
+                "year", "month", "day"
+            ).order_by(
+                desc("year"), desc("month"), desc("day")
+            )  # type: ignore
+        elif period == "week":
+            query = query.add_columns(
+                extract("week", models.Sale.sale_date).label("week")
+            ).group_by(
+                "year", "week"
+            ).order_by(
+                desc("year"), desc("week")
+            )  # type: ignore
+        elif period == "month":
+            query = query.add_columns(
+                extract("month", models.Sale.sale_date).label("month")
+            ).group_by(
+                "year", "month"
+            ).order_by(
+                desc("year"), desc("month")
+            )  # type: ignore
+        else:  # year
+            query = query.group_by(
+                "year"
+            ).order_by(
+                desc("year")
+            )
+
+        results = query.limit(compare_periods).all()
+
+        # Format results based on period type
+        formatted_results = []
+        for r in results:
+            result = {
+                "total_amount": float(r.total_amount),
+                "category": category if category else "all"
+            }
+
+            if period == "day":
+                result["period"] = f"{int(r.year)}-{int(r.month):02d}-{int(r.day):02d}"
+            elif period == "week":
+                result["period"] = f"{int(r.year)}-W{int(r.week):02d}"
+            elif period == "month":
+                result["period"] = f"{int(r.year)}-{int(r.month):02d}"
+            else:  # year
+                result["period"] = f"{int(r.year)}"
+
+            formatted_results.append(result)
+
+        return formatted_results

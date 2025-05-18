@@ -34,3 +34,17 @@ def list_sales(
 @router.get("/revenue")
 def get_revenue(period: str = "day", db: Session = Depends(get_db)):
     return SaleService(db).get_revenue_by_period(period)
+
+
+@router.get("/revenue/comparison")
+def compare_revenue(
+    period: str = "month",
+    category: str = None,
+    compare_periods: int = 2,  # Compare last 2 periods by default
+    db: Session = Depends(get_db)
+):
+    return SaleService(db).get_revenue_comparison(
+        period=period,
+        category=category,
+        compare_periods=compare_periods
+    )
