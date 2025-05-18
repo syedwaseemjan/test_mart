@@ -66,3 +66,23 @@ def update_stock(product_id: int, data: schemas.InventoryBase, db: Session = Dep
     if not inventory:
         raise HTTPException(status_code=404, detail="Inventory not found")
     return inventory
+
+
+@router.get("/{product_id}/logs", response_model=list[schemas.InventoryLog])
+def get_inventory_logs(product_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Retrieves paginated inventory logs for a specific product.
+
+    Args:
+        product_id (int): ID of the product to get logs for.
+        skip (int): Number of logs to skip for pagination. Defaults to 0.
+        limit (int): Maximum number of logs to return. Defaults to 100.
+
+    Returns:
+        list[schemas.InventoryLog]: List of inventory log entries
+        ordered by most recent changes first
+
+    Raises:
+        HTTPException: 404 if product doesn't exist
+    """
+
+    return InventoryService(db).get_logs(product_id, skip=skip, limit=limit)

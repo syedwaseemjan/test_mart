@@ -69,3 +69,16 @@ class Sale(SaleBase):
     total_amount: Annotated[Decimal, Field(...)]
 
     model_config = {"from_attributes": True}
+
+
+class InventoryLogBase(BaseModel):
+    product_id: Annotated[int, Field(...)]
+    change: Annotated[int, Field(...)]
+    reason: Annotated[str, Field(...)]
+    changed_at: Annotated[datetime, Field(...)]
+
+
+class InventoryLog(InventoryLogBase):
+    id: int
+
+    model_config = {"from_attributes": True}
