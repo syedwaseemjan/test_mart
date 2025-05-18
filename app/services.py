@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, extract, func
+from sqlalchemy import extract, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -136,28 +136,28 @@ class SaleService:
             self.db.rollback()
             raise HTTPException(status_code=500, detail="Internal server error during sale transaction")
 
-    def get_sales_by_date_range(
-        self, start_date: Optional[date] = None, end_date: Optional[date] = None
+    def get_filtered_sales(
+        self,
+        product_id: Optional[int] = None,
+        category: Optional[str] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None
     ) -> list[models.Sale]:
         query = self.db.query(models.Sale)
-        filters = []
+
+        if product_id:
+            query = query.filter(models.Sale.product_id == product_id)
+
+        if category:
+            query = query.join(models.Product).filter(models.Product.category == category)
+
         if start_date:
-            filters.append(models.Sale.sale_date >= start_date)
+            query = query.filter(models.Sale.sale_date >= start_date)
+
         if end_date:
-            filters.append(models.Sale.sale_date <= end_date)
+            query = query.filter(models.Sale.sale_date <= end_date)
 
-        if filters:
-            query = query.filter(and_(*filters))
-
-        return query.all()
-        return (
-            self.db.query(models.Sale)
-            .filter(models.Sale.sale_date >= start_date, models.Sale.sale_date <= end_date)
-            .all()
-        )
-
-    def get_sales_by_product(self, product_id: int) -> list[models.Sale]:
-        return self.db.query(models.Sale).filter(models.Sale.product_id == product_id).all()
+        return query.order_by(models.Sale.sale_date.desc()).all()
 
     def get_revenue_by_period(self, period: str = "day") -> list[dict]:
         sale_date = models.Sale.sale_date

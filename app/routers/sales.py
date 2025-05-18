@@ -16,13 +16,19 @@ def create_sale(sale: schemas.SaleCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[schemas.Sale])
-def list_sales(start_date: date = None, end_date: date = None, db: Session = Depends(get_db)):
-    return SaleService(db).get_sales_by_date_range(start_date, end_date)
-
-
-@router.get("/by-product/{product_id}", response_model=list[schemas.Sale])
-def get_sales_by_product(product_id: int, db: Session = Depends(get_db)):
-    return SaleService(db).get_sales_by_product(product_id)
+def list_sales(
+    product_id: int = None,
+    category: str = None,
+    start_date: date = None,
+    end_date: date = None,
+    db: Session = Depends(get_db)
+):
+    return SaleService(db).get_filtered_sales(
+        product_id=product_id,
+        category=category,
+        start_date=start_date,
+        end_date=end_date
+    )
 
 
 @router.get("/revenue")
