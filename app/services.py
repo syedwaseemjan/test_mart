@@ -50,6 +50,10 @@ class InventoryService:
 
         db_inventory = models.Inventory(**inventory.model_dump())
         self.db.add(db_inventory)
+
+        log = models.InventoryLog(product_id=inventory.product_id, change=inventory.stock, reason="initial stock")
+        self.db.add(log)
+
         self.db.commit()
         self.db.refresh(db_inventory)
         return db_inventory
@@ -66,10 +70,28 @@ class InventoryService:
     def update_inventory_stock(self, product_id: int, stock: int) -> Optional[models.Inventory]:
         inventory = self.get_inventory(product_id)
         if inventory:
+            change = stock - inventory.stock
             inventory.stock = stock
+
+            log = models.InventoryLog(product_id=product_id, change=change, reason="manual adjustment")
+            self.db.add(log)
             self.db.commit()
             self.db.refresh(inventory)
         return inventory
+
+    def get_logs(self, product_id: int, skip: int = 0, limit: int = 100) -> list[models.InventoryLog]:
+        product = ProductService(self.db).get_product(product_id)
+        if not product:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found")
+
+        return (
+            self.db.query(models.InventoryLog)
+            .filter(models.InventoryLog.product_id == product_id)
+            .order_by(models.InventoryLog.changed_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
 
 class SaleService:
@@ -101,6 +123,11 @@ class SaleService:
             self.db.add(db_sale)
 
             inventory.stock -= sale.quantity
+
+            log = models.InventoryLog(
+                product_id=sale.product_id, change=-sale.quantity, reason="sale"  # Negative for deduction
+            )
+            self.db.add(log)
 
             self.db.commit()
             self.db.refresh(db_sale)
