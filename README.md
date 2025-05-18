@@ -4,18 +4,20 @@ A FastAPI-powered backend for an e-commerce admin dashboard providing sales anal
 
 ## Development Requirements
 
-- Docker
 - Python 3.11+
+- Poetry
+- Docker
 
 ## Installation
 
 ```sh
+make generate_dot_env (For quick setup, you can skip this step and use `cp .env.example .env`)
 docker-compose build --no-cache
 docker-compose up
 make migrate
+make demo_data
 make lint
 make test
-make demo_data
 ```
 
 ## Running linting
